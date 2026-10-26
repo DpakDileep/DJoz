@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -8,7 +9,9 @@ import Videos from "./pages/Videos";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
 
-function App() {
+function RouteScripts() {
+  const location = useLocation();
+
   useEffect(() => {
     const script1 = document.createElement("script");
     script1.src = "/js/main.js";
@@ -27,9 +30,16 @@ function App() {
       script2.remove();
     };
   }, [location.pathname]);
+
+  return null;
+}
+
+function App() {
   return (
     <>
       <BrowserRouter>
+        <RouteScripts />
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
