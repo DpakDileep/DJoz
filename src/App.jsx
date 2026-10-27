@@ -1,6 +1,5 @@
-
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Discography from "./pages/Discography";
@@ -12,22 +11,45 @@ import Contact from "./pages/Contact";
 function RouteScripts() {
   const location = useLocation();
 
-  useEffect(() => {
-    const script1 = document.createElement("script");
+  useLayoutEffect(() => {
+    let cancelled = false;
+    let script1;
+    let script2;
+
+    const cleanupNiceScroll = () => {
+      const $ = window.jQuery;
+
+      if (!$?.fn?.getNiceScroll) return;
+
+      $(".nice-scroll").each(function () {
+        const instance = $(this).getNiceScroll();
+
+        if (instance && instance.length) {
+          instance.remove();
+        }
+      });
+    };
+
+    script1 = document.createElement("script");
     script1.src = "/js/main.js";
 
-    const script2 = document.createElement("script");
-    script2.src = "/js/jplayerInit.js";
-
     script1.onload = () => {
+      if (cancelled) return;
+
+      script2 = document.createElement("script");
+      script2.src = "/js/jplayerInit.js";
       document.body.appendChild(script2);
     };
 
     document.body.appendChild(script1);
 
     return () => {
-      script1.remove();
-      script2.remove();
+      cancelled = true;
+
+      cleanupNiceScroll();
+
+      script1?.remove();
+      script2?.remove();
     };
   }, [location.pathname]);
 
